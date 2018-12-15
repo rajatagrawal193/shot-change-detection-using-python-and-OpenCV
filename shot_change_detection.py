@@ -8,26 +8,6 @@ import shutil
 import timeit
 import time
 
-def make_directories():
-    if os.path.exists('output'):
-        shutil.rmtree('output')
-    os.mkdir('output')
-    frames_url='output/frames'
-    difference_images_url='output/difference_images'
-    shots_url='output/shots'
-    stacked_matrix_url='output'
-
-    if os.path.exists(frames_url):
-        shutil.rmtree(frames_url)
-    os.mkdir(frames_url)
-    if os.path.exists(difference_images_url):
-        shutil.rmtree(difference_images_url)
-    os.mkdir(difference_images_url)
-    if os.path.exists(shots_url):
-        shutil.rmtree(shots_url)
-    os.mkdir(shots_url)
-
-
 def detect_shot_change(video_url, frames_url, difference_images_url, shots_url,stacked_matrix_url):
     start = time.time()
     
@@ -85,51 +65,6 @@ def detect_shot_change_util(video_url, frames_url, difference_images_url, shots_
             i=i+2
         else: i+=1
 
-    
-
-    # cv2.imshow("output", stacked_matrix)
-    # cv2.waitKey(0)
-    
-def convert_to_frames(video_url):
-    # To convert the input video to frames
-    # cmd='ffmpeg -i '+ video_url+' -filter:v scale=480:-1 '+frames_url+'/frame%3d.png'
-    # os.system(cmd)
-    cap= cv2.VideoCapture(video_url)
-    # print(cap)
-    # success, image = cap.read()
-    images=[]
-    currentFrame = 0
-    print(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
-    success=True 
-    while(success):
-        # Capture frame-by-frame
-        success, image = cap.read()
-        if success:
-            image= cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            
-            image= imutils.resize(image, width=480)
-            
-            name = 'output/frames/frame' + str(currentFrame) + '.jpg'
-            print ('Creating...' + name)
-            # cv2.imwrite(name, image)
-            images.append(image)
-        
-        
-        currentFrame += 1
-
-    cap.release()
-    return images
-
-
-def list_the_frames(frames_url):
-    #List all the frame images from the directory and store it in files and sort them.
-    files = os.listdir(frames_url)
-    files= sorted(files, key=lambda x:int(x.split('.')[0][5:]))
-    # files.sort()
-    print(files)
-
-    return files
-
 def get_subtracted_matrix(image1, image2, rows, columns):
     lLimit= 25 
     rLimit= 100
@@ -139,29 +74,10 @@ def get_subtracted_matrix(image1, image2, rows, columns):
     subtracted_matrix[subtracted_matrix<=lLimit]=0
     return subtracted_matrix
 
-def read_the_images(files, frames_url):
-    images=[]
-    files_length=len(files)    
-    for i in range(files_length):
-        # print('processing image {} of {}'.format(i+1, files_length))  
-
-        images.append(cv2.imread(frames_url+'/'+files[i], 0))
-    return images
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     if len(sys.argv)< 2:
         print('USAGE...  SOMETHING')
     
-    # make_directories() #Make the required directories for output
     video_url= sys.argv[1]
     if os.path.exists('output'):
         shutil.rmtree('output')
@@ -181,9 +97,4 @@ if __name__ == '__main__':
         shutil.rmtree(shots_url)
     os.mkdir(shots_url)
 
-   
-
-
-    detect_shot_change(video_url, frames_url, difference_images_url, shots_url,stacked_matrix_url)
-    # detect_shot_change_util(video_url, frames_url, difference_images_url, shots_url,stacked_matrix_url)
-    
+    detect_shot_change(video_url, frames_url, difference_images_url, shots_url,stacked_matrix_url)    
